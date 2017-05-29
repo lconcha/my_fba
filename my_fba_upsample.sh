@@ -64,10 +64,17 @@ mkdir $tmpDir
 tmpFile1=${tmpDir}/tmpFile1.mif
 tmpFile2=${tmpDir}/tmpFile2.mif
 
-my_do_cmd mrresize $dwis_std -voxel $voxelsize $tmpFile1
-cp -v $tmpFile1 $dwis_upsampled
+if [ ! $voxelsize -eq 0 ]
+then
+  my_do_cmd mrresize $dwis_std -voxel $voxelsize $tmpFile1
+  cp -v $tmpFile1 $dwis_upsampled
 
-my_do_cmd mrresize -voxel $voxelsize -interp nearest $mask $tmpFile2
-cp -v $tmpFile2 $mask_upsampled
+  my_do_cmd mrresize -voxel $voxelsize -interp nearest $mask $tmpFile2
+  cp -v $tmpFile2 $mask_upsampled
+else
+  echo "  [INFO] Not resampling. Only creating links."
+  ln -sv `readlink -f $dwis_std` $dwis_upsampled
+  ln -sv `readlink -f $mask` $mask_upsampled
+fi
 
 rm -fR $tmpDir

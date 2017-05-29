@@ -33,14 +33,16 @@ do
         fi
       echo "  [INFO] File found for subject $subj  : $F"
       mrinfo -size $F >> ${tmpDir}/sizes.txt
-      mrconvert -quiet $dim $F ${tmpDir}/${subj}.mif
+      my_do_cmd mrconvert -quiet $dim $F ${tmpDir}/${subj}.mif
     fi
   fi
 done
 
 
 cat ${tmpDir}/sizes.txt
-mrcat -quiet -force ${tmpDir}/*.mif QC_${filetocheck}
+ls ${tmpDir}/sizes.txt
+
+my_do_cmd mrcat -quiet -force ${tmpDir}/*.mif QC_${filetocheck}
 
 
 rm -fR $tmpDir
