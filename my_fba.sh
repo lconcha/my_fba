@@ -38,9 +38,10 @@ Options:
 -fwhm <int>
 -nperms <int>
 -nsubjs_for_template <int>    : Number of subjects to build template from. Default is all available.
--voxelsize <float>            : Define the desired voxel resolution for the upsampling step. 
-                                This value is in mm and is applied to all three dimensions 
+-voxelsize <float>            : Define the desired voxel resolution for the upsampling step.
+                                This value is in mm and is applied to all three dimensions
                                 (thus producing isometric voxels). Default is $voxelsize mm.
+                                NOTE: Input -voxelsize 0 if you do not wish to resample your dwis.
 -nTracksOrig <int>            : Number of tracks to obtain from FOD template.
                                 Default is $nTracksOrig
 -nTracksSift <int>            : Number of tracks to keep after SIFT
@@ -56,9 +57,10 @@ simplemetrics         : Compute simple metrics from the tensor (useful for QC)
 mask                  : 1. Compute a mask per subject
 std_signal            : 2. Signal intensity normalization and scaling based on whole white matter.
                            This is necessary to make AFD metric have similar units between subjects.
-upsample              : 3. Upsample the images to have a resolution 
+upsample              : 3. Upsample the images to have a resolution
                            as defined by -voxelsize (Default $voxelsize mm).
-response              : 4. Compute the response function. 
+                           NOTE: Input -voxelsize 0 if you do not wish to resample your dwis.
+response              : 4. Compute the response function.
 av_response           : 5. Average all subjects response functions to a single one.
                            This response function will be used to estimate FODs on each subject.
 fod                   : 6. Compute the FOD
@@ -80,8 +82,8 @@ stats                 : 16. Compute statistics
                             -results_prefix   <string> (no default)
                             -fwhm <float>    FWHM of smoothing kernel in mm (Default = $fwhm)
                             -nperms <int>    Number of permutations to execute (Default = $nperms)
-                            -fixel_metric <string>   Which fixel metric to evaluate. 
-                               Options are fd, fc_log, and fdc (fiber density, log of fiber cross-section, and 
+                            -fixel_metric <string>   Which fixel metric to evaluate.
+                               Options are fd, fc_log, and fdc (fiber density, log of fiber cross-section, and
                                fiber density and cross-section, respectively).
                                Default is $fixel_metric
 
@@ -99,7 +101,7 @@ FBA_DIR
    \- s002
    \- s003
        \- dwis.mif
-  
+
 
 LU15 (0N(H4
 INB, UNAM
@@ -122,7 +124,7 @@ fi
 for arg in "$@"
 do
   case "$arg" in
-  -h|-help) 
+  -h|-help)
     help
     exit 1
   ;;
@@ -253,7 +255,7 @@ do
     continue
   fi
   subj=`basename $s`
-  
+
   if [[ "$subj" = "logs" ]]
   then
     continue
