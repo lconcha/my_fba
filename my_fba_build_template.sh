@@ -1,6 +1,27 @@
 #!/bin/bash
 source `which my_do_cmd`
 
+help() {
+echo "
+  `basename $0` [nSubjects]
+
+"
+}
+
+
+
+for arg in "$@"
+do
+  case "$arg" in
+  -h|-help)
+    help
+    exit 1
+  ;;
+esac
+done
+
+
+
 auto_nsubjs=0
 if [ $1 -eq 0 ]
 then
@@ -57,7 +78,7 @@ fi
 
 available_subjects_file=${FBA_DIR}/logs/template/available_subjects_to_build_template_from.txt
 ls ${FBA_DIR}/*/wm_fod.mif > $available_subjects_file
-n_available_subjects=`wc -l $available_subjects_file | awk '{print $1}'` 
+n_available_subjects=`wc -l $available_subjects_file | awk '{print $1}'`
 
 if [ $n_available_subjects -eq 0 ]
 then
@@ -94,7 +115,7 @@ do
   ln_mask=${ln_mask_dir}/${subj}_mask.mif
   ln -s $fod $ln_fod
   ln -s $mask $ln_mask
-  
+
 done < <(cat $subjects_file)
 
 
@@ -106,8 +127,8 @@ echo "  [INFO] It is best to run this step on an execution host.
                Below is the command you should run.
                If you want to run it on the cluster, prepend fsl_sub to the command.
                * Also, your /tmp partition should be plentiful (several GB)
-               If it is not, then use the switch -tempdir \${FBA_DIR}/logs/template 
-               in the following command.               
+               If it is not, then use the switch -tempdir \${FBA_DIR}/logs/template
+               in the following command.
 "
 
 my_do_cmd -fake population_template \

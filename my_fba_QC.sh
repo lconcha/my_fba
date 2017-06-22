@@ -1,6 +1,36 @@
 #!/bin/bash
 source `which my_do_cmd`
 
+
+help() {
+echo "
+  `basename $0` <prefix> <filetocheck> <nslices>
+
+"
+}
+
+
+if [ "$#" -lt 3 ]
+then
+  echo "  [ERROR]. Insufficient arguments."
+  help
+  exit 2
+fi
+
+
+
+for arg in "$@"
+do
+  case "$arg" in
+  -h|-help)
+    help
+    exit 1
+  ;;
+esac
+done
+
+
+
 prefix=$1
 filetocheck=$2
 nslices=$3
