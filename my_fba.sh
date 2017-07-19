@@ -245,7 +245,8 @@ done
 if [ -z "$list_of_subjects" ]
 then
   echo "  [INFO] List of subjects automatically populated."
-  list_of_subjects=`ls ${FBA_DIR}/`
+  list_of_subjects=`ls -d ${FBA_DIR}/*`
+
 fi
 
 for s in $list_of_subjects
@@ -267,7 +268,7 @@ do
     continue
   fi
 
-  #echo $subj
+  echo "  [INFO] Submitting job $stepToRun for subject $subj"
 
   case $stepToRun in
   test)

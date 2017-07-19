@@ -89,7 +89,7 @@ c=0
 RAMneeded=64
 while read line;
 do
-  thisContrast=${FBA_DIR}/logs/${analysis_prefix}_contrast_${c}.txt
+  thisContrast=${FBA_DIR}/logs/`basename ${analysis_prefix}`_contrast_${c}.txt
   echo "  [INFO] Contrast $c is $thisContrast"
   echo "         $line"
   echo $line > $thisContrast
