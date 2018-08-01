@@ -7,6 +7,8 @@ It is intended to be an easy-to-use interface to the several steps needed to com
 
 The pipeline depends on mrtrix3 tools. Keep in mind that mrtrix3 is under active development, so it would not be surprising if some tools change and this pipeline needs some tweaking. Also, it would not be so surprising if the fine folk developing mrtrix3 release a pipeline that supersedes this one.
 
+This pipeline works with mrtrix version 0.3.15-294-ge8a525c6. If newer versions of mrtrix break this pipeline, you can download this specific version from their github page.
+
 The data must be organized in a certain way before you run my_fba, and you must perform decent pre-processing of your data before you begin any FBA. This includes denoising, motion-correction/eddy, and intensity normalization. Data organization is as follows:
 
 1. Define a global variable $FBA_DIR that holds the absolute path to where all your data is stored for this study.
