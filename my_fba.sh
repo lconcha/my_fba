@@ -13,6 +13,7 @@ voxelsize=1.0
 nTracksOrig=20000000
 nTracksSift=2000000
 fixel_metric="fd"
+nthreads=7
 ### end defaults
 
 
@@ -46,6 +47,7 @@ Options:
                                 Default is $nTracksOrig
 -nTracksSift <int>            : Number of tracks to keep after SIFT
                                 Default is $nTracksSift
+-nthreads <int>               : Number of threads per job.
 
 Note that -analysis_prefix and -results_prefix are mandatory if the Step stats is to be executed.
 
@@ -183,6 +185,11 @@ do
    echo "  [INFO] User specified fixel metric to evaluate in stats, setting it to $fixel_metric"
    shift;shift
   ;;
+  -nthreads)
+   nthreads=$2
+   echo "  [INFO] User specified nthreads: $nthreads"
+   shift;shift
+  ;;
   esac
 done
 
@@ -275,51 +282,51 @@ do
     echo "  This is just a test for subject $subj"
   ;;
   qtest)
-    fsl_sub -R 3 -N s${subj}_test -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads -N s${subj}_test -l ${FBA_DIR}/logs \
     my_fba_test.sh $subj
   ;;
   mask)
-    fsl_sub -R 3 -N s${subj}_mask -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads -N s${subj}_mask -l ${FBA_DIR}/logs \
         my_fba_mask.sh $subj
   ;;
   std_signal)
-    fsl_sub -R 3 -N s${subj}_std -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads -N s${subj}_std -l ${FBA_DIR}/logs \
         my_fba_stdSignal.sh $subj fa
   ;;
   response)
-    fsl_sub -R 3 -N s${subj}_resp -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads -N s${subj}_resp -l ${FBA_DIR}/logs \
         my_fba_response.sh $subj
   ;;
   upsample)
-    fsl_sub -R 3 -N s${subj}_up -l ${FBA_DIR}/logs -R 6 \
+    fsl_sub -s smp,$nthreads -N s${subj}_up -l ${FBA_DIR}/logs -R 6 \
         my_fba_upsample.sh $subj $voxelsize
   ;;
   fod)
-    fsl_sub -R 3 -N s${subj}_fod -l ${FBA_DIR}/logs -R 6 \
+    fsl_sub -s smp,$nthreads -N s${subj}_fod -l ${FBA_DIR}/logs -R 6 \
         my_fba_fod.sh $subj
   ;;
   fod2template)
-     fsl_sub -R 3 -N s${subj}_rfod -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_rfod -l ${FBA_DIR}/logs -R 6 \
         my_fba_fod2template.sh $subj
   ;;
   afd)
-     fsl_sub -R 3 -N s${subj}_afd -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_afd -l ${FBA_DIR}/logs -R 6 \
         my_fba_afd.sh $subj
   ;;
   fixel_reorient)
-     fsl_sub -R 3 -N s${subj}_fr -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_fr -l ${FBA_DIR}/logs -R 6 \
         my_fba_fixelReorient.sh $subj
   ;;
   fixel_correspondence)
-     fsl_sub -R 3 -N s${subj}_fc -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_fc -l ${FBA_DIR}/logs -R 6 \
         my_fba_fixelcorrespondence.sh $subj
   ;;
   fixel_metrics)
-     fsl_sub -R 3 -N s${subj}_fm -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_fm -l ${FBA_DIR}/logs -R 6 \
         my_fba_computeMetrics.sh $subj
   ;;
   simplemetrics)
-     fsl_sub -R 3 -N s${subj}_t -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_t -l ${FBA_DIR}/logs -R 6 \
         my_fba_simplemetrics.sh $subj
   ;;
   *)
