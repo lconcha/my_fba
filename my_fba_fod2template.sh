@@ -59,7 +59,7 @@ my_do_cmd mrregister $fod \
 echo "  [INFO] Transforming fod to template without fixel reorientation"
 my_do_cmd mrtransform $fod \
   -warp $warp_subj2template \
-  -noreorientation \
+  -reorient_fod no \
   $transformed_fod
 
 
