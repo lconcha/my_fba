@@ -66,6 +66,7 @@ response              : 4. Compute the response function.
 av_response           : 5. Average all subjects response functions to a single one.
                            This response function will be used to estimate FODs on each subject.
 fod                   : 6. Compute the FOD
+mtnormalise           : 6a. Multi-tissue intensity normalisation of FODs.
 build_fod_template    : 7. Build the FOD template. Very time consuming.
 fod2template          : 8. Register the subject FOD to the template FOD.
 maskIntersection      : 9. Calculate the intersection of masks of all subjects.
@@ -304,6 +305,10 @@ do
   fod)
     fsl_sub -s smp,$nthreads -N s${subj}_fod -l ${FBA_DIR}/logs -R 6 \
         my_fba_fod.sh $subj
+  ;;
+  mtnormalise)
+    fsl_sub -s smp,$nthreads -N s${subj}_fod -l ${FBA_DIR}/logs -R 6 \
+        my_fba_mtnormalise.sh $subj
   ;;
   fod2template)
      fsl_sub -s smp,$nthreads -N s${subj}_rfod -l ${FBA_DIR}/logs -R 6 \
