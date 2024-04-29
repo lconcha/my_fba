@@ -212,17 +212,17 @@ done
     exit 0
   ;;
   maskIntersection)
-    fsl_sub -N maskIntx -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads  -N maskIntx -l ${FBA_DIR}/logs \
     my_fba_maskIntersection.sh
     exit 0
   ;;
   fixel_mask)
-    fsl_sub -N fixelmask -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads  -N fixelmask -l ${FBA_DIR}/logs \
     my_fba_createFixelMask.sh $fixel_mask_threshold
     exit 0
   ;;
   tracto)
-    fsl_sub -N tracto -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads  -N tracto -l ${FBA_DIR}/logs \
     my_fba_fullTemplateTracto.sh $nTracksOrig $nTracksSift
     exit 0
   ;;
