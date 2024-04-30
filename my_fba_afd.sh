@@ -19,7 +19,8 @@ subj=$1
 # 9. Segment FOD images to estimate fixels and their fibre density (FD)
 # Here we segment each FOD lobe to identify the number and orientation of fixels in each voxel. The output also contains the apparent fibre density (AFD) value per fixel estimated as the FOD lobe integral. Note that in the following steps we will use a more generic shortened acronym - Fibre Density (FD) instead of AFD.
 
-fd_noReoriented=${FBA_DIR}/${subj}/fd_templateSpace_noReorient
+sub_fixeldir=${FBA_DIR}/${subj}/fixels
+fd_noReoriented=fd_templateSpace_noReorient.mif
 fod_std=${FBA_DIR}/${subj}/fod_templateSpace_noReorient.mif
 analysis_voxel_mask=${FBA_DIR}/template_analysis_voxel_mask.mif
 
@@ -47,4 +48,5 @@ fi
 my_do_cmd fod2fixel \
   $fod_std \
   -mask $analysis_voxel_mask \
-  -afd $fd_noReoriented
+  -afd $fd_noReoriented \
+  $sub_fixeldir
