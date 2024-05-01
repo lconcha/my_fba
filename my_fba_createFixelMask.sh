@@ -17,11 +17,11 @@ fi
 
 template_fod=${FBA_DIR}/template_fod.mif
 template_mask=${FBA_DIR}/template_mask_intersection.mif
-analysis_fixel_mask=${FBA_DIR}/template_analysis_fixel_mask.msf
+template_fixel_mask=${FBA_DIR}/template_fixel_mask
 
-if [ -f $analysis_fixel_mask ]
+if [ -d $template_fixel_mask ]
 then
-  echo "  [INFO] Analysis fixel mask exists: $analysis_fixel_mask"
+  echo "  [INFO] Analysis fixel mask exists: $template_fixel_mask"
   echo "         Not overwriting. Exit now."
   exit 0
 fi
@@ -61,5 +61,13 @@ analysis_voxel_mask=${FBA_DIR}/template_analysis_voxel_mask.mif
 my_do_cmd fixel2voxel ${template_peaks}/directions.mif count ${tmpDir}/fixelcounts.mif 
 my_do_cmd mrthreshold ${tmpDir}/fixelcounts.mif ${tmpDir}/fixelcounts_abs.mif -abs 0.5
 my_do_cmd mrfilter ${tmpDir}/fixelcounts_abs.mif median $analysis_voxel_mask
+
+# Generate a fixel mask
+my_do_cmd fod2fixel \
+  -mask $analysis_voxel_mask  \
+  -fmls_peak_value 0.06 \
+  $template_fod \
+  $template_fixel_mask
+
 
 rm -fRv $tmpDir
