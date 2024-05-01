@@ -23,13 +23,15 @@ subj=$1
 
 
 
-fd_std_reorient=${FBA_DIR}/${subj}/fd_templateSpace_reorient.msf
-analysis_fixel_mask=${FBA_DIR}/template_analysis_fixel_mask.msf
-fd_std_corr2template=${FBA_DIR}/${subj}/fd_templateSpace_corresp2template.msf
+fd_std_reorient=${FBA_DIR}/${subj}/fixels_reoriented/fd_templateSpace_noReorient.mif
+template_fixels=${FBA_DIR}/template_peaks
+template_fixel_mask=${FBA_DIR}/template_fixel_mask
+fd_std_corr2template=${FBA_DIR}/${subj}/fixels_corresp2template
+fout=corresp.mif
 
 
 isOK=1
-for f in $fd_std_reorient $analysis_fixel_mask
+for f in $fd_std_reorient
 do
   if [ ! -f $f ]
   then
@@ -37,6 +39,16 @@ do
     isOK=0
   fi
 done
+
+if [ ! -d $template_fixels ]
+then
+  echo "[ERROR] Cannot find directory: $template_fixels"
+  isOK=0
+fi
+
+
+
+
 if [ $isOK -eq 0 ]
 then
   echo "  [ERROR] Cannot perform fixel correspondence for subject $subj. Quitting."
@@ -44,6 +56,11 @@ then
 fi
 
 
-my_do_cmd fixelcorrespondence $fd_std_reorient \
-  $analysis_fixel_mask \
-  $fd_std_corr2template
+my_do_cmd fixelcorrespondence \
+  $fd_std_reorient \
+  $template_fixels \
+  $fd_std_corr2template \
+  $fout
+
+
+ln -s -v  $fd_std_corr2template/$fout  ${template_fixel_mask}/${subj}_fixelcorresp.mif
