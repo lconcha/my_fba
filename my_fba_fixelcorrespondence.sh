@@ -64,4 +64,4 @@ my_do_cmd fixelcorrespondence \
   $fout
 
 
-ln -s -v -f $fd_std_corr2template/$fout  ${template_fixel_mask}/${subj}_fixelcorresp.mif
+ln -s -v -f $fd_std_corr2template/$fout  ${template_fixel_mask}/${subj}_fd.mif
