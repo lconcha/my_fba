@@ -276,6 +276,12 @@ do
     continue
   fi
 
+  if [ ! -f ${FBA_DIR}/${subj}/dwis.mif ]
+  then
+    echo "  [INFO] $subj is not a valid subject."
+    continue
+  fi
+
   echo "  [INFO] Submitting job $stepToRun for subject $subj"
 
   case $stepToRun in
