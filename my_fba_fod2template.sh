@@ -18,7 +18,7 @@ fi
 
 fod=${FBA_DIR}/${subj}/wm_fod.mif
 mask=${FBA_DIR}/${subj}/mask_upsampled.mif
-fod_template=${FBA_DIR}/template_fod.mif
+fod_template=${FBA_DIR}/template/fod.mif
 warp_subj2template=${FBA_DIR}/${subj}/fod_subj2template_warp.mif
 warp_template2subj=${FBA_DIR}/${subj}/fod_template2subj_warp.mif
 transformed_fod=${FBA_DIR}/${subj}/fod_templateSpace_noReorient.mif
