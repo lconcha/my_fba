@@ -3,7 +3,7 @@
 
 ### Defaults
 list_of_subjects=""
-fixel_mask_threshold=0.25
+fixel_mask_threshold=0.06
 fwhm=10
 nperms=5000
 prefix=""
