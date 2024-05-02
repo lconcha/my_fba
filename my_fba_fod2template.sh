@@ -24,6 +24,15 @@ warp_template2subj=${FBA_DIR}/${subj}/fod_template2subj_warp.mif
 transformed_fod=${FBA_DIR}/${subj}/fod_templateSpace_noReorient.mif
 transformed_mask=${FBA_DIR}/${subj}/mask_templateSpace.mif
 
+
+fcheck=$transformed_fod
+if [ -f $fcheck ]
+then
+  echo "[INFO] File exists, not overwriting: $fcheck"
+  exit 0
+fi
+
+
 echo "  [INFO] Starting FOD registration for subject $subj"
 
 
