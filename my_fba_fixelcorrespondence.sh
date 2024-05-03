@@ -23,12 +23,19 @@ subj=$1
 
 
 
-fixels_std_reorient=${FBA_DIR}/${subj}/fixels_in_template_space_reoriented
-fd=${fixels_std_reorient}/fd.mif
-template_fixels=${FBA_DIR}/template_peaks
-template_fixel_mask=${FBA_DIR}/template_fixel_mask
-fd_std_corr2template=${FBA_DIR}/${subj}/fixels_corresp2template
-fout=corresp.mif
+fd_fixels_std_reorient=${FBA_DIR}/${subj}/fixels_in_template_space_reoriented/fd.mif
+template_fd=${FBA_DIR}/template/fd
+template_fixel_mask=${FBA_DIR}/template/fixel_mask
+subj_fd_reoriented=${subj}.mif
+
+
+fcheck=${template_fd}/${subj_fd_reoriented}
+if [ -f $fcheck ]
+then
+  echo "[INFO] File exists, not overwriting: $fcheck"
+  exit 0
+fi
+
 
 
 isOK=1
@@ -58,10 +65,8 @@ fi
 
 
 my_do_cmd fixelcorrespondence \
-  $fd \
-  $template_fixels \
-  $fd_std_corr2template \
-  $fout
+  $fd_fixels_std_reorient \
+  $template_fixel_mask \
+  $template_fd \
+  $subj_fd_reoriented
 
-
-ln -s -v -f $fd_std_corr2template/$fout  ${template_fixel_mask}/${subj}_fd.mif
