@@ -21,7 +21,7 @@ subj=$1
 
 # inputs
 fod_std=${FBA_DIR}/${subj}/fod_templateSpace_noReorient.mif
-analysis_voxel_mask=${FBA_DIR}/template_analysis_voxel_mask.mif
+analysis_voxel_mask=${FBA_DIR}/template/analysis_voxel_mask.mif
 
 # outputs
 sub_fixeldir=${FBA_DIR}/${subj}/fixels_in_template_space_NOT_REORIENTED
