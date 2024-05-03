@@ -79,7 +79,12 @@ fixel_metrics         : 14. Compute fibre cross-section (FC) and fibre density a
 tracto                : 15. Run tractography on the template FOD.
                             Will create $nTracksOrig tracks
                             then run SIFT to get it down to $nTracksSift.
-stats                 : 16. Compute statistics
+fixelconnectivity     : 16. Compute the fixel-fixel connectivity  matrix.
+                            It is highly recommended to increase -nthreads
+                            (check your cluster with qhost and find how high you can go)
+fixelfilter           : 17. Smooth the fixels. 
+                            Change the fwhm using -fwhm. Default is $fwhm.
+stats                 : 18. Compute statistics
                             Requires some additional information, supplied by these switches:
                             -analysis_prefix <string> (no default)
                             -results_prefix   <string> (no default)
@@ -224,6 +229,18 @@ done
   tracto)
     fsl_sub -s smp,$nthreads  -N tracto -l ${FBA_DIR}/logs \
     my_fba_fullTemplateTracto.sh $nTracksOrig $nTracksSift
+    exit 0
+  ;;
+  fixelfilter)
+    echo "[INFO] This step needs a lot of RAM. fsl_sub will try to find a PC with at least 24G."
+    fsl_sub -s smp,$nthreads  -N fixelfilt -l ${FBA_DIR}/logs -R 24000 \
+    my_fba_fixelfilter.sh $fwhm
+    exit 0
+  ;;
+  fixelconnectivity)
+    echo "[INFO] This step needs a lot of RAM. fsl_sub will try to find a PC with at least 24G."
+    fsl_sub -s smp,$nthreads  -N fixelconn -l ${FBA_DIR}/logs -R 24000 \
+    my_fba_fixelconnectivity.sh
     exit 0
   ;;
   stats)

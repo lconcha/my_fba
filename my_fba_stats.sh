@@ -34,16 +34,16 @@ fixel_metric=$5
 subjects=${analysis_prefix}.subjects
 designmat=${analysis_prefix}.design_matrix
 contrasts=${analysis_prefix}.contrasts
-analysis_fixel_mask=${FBA_DIR}/template_analysis_fixel_mask.msf
-template_sift_tracks=${FBA_DIR}/template_fullTracto_sifted.tck
-
+analysis_fixel_mask=${FBA_DIR}/template/fixel_mask
+template_sift_tracks=${FBA_DIR}/template/fullTracto_sifted.tck
+connmatrix=${FBA_DIR}/template/matrix
 
 
 
 
 
 isOK=1
-for f in $designmat $contrasts $analysis_fixel_mask $template_sift_tracks
+for f in $designmat $contrasts $template_sift_tracks
 do
   if [ ! -f $f ]
   then
@@ -51,8 +51,18 @@ do
     isOK=0
   fi
 done
-
-
+for d in $connmatrix $analysis_fixel_mask
+do
+  if [ ! -d $d ]
+  then
+      echo "  [ERROR] Cannot find directory: $d"
+      isOK=0
+  fi
+done
+if [ $isOK -eq 0 ]
+then
+  exit 2
+fi
 
 
 
@@ -61,14 +71,16 @@ inputFiles=${FBA_DIR}/logs/inputFiles_`basename $analysis_prefix`_${fixel_metric
 if [ -f $inputFiles ]; then rm $inputFiles;fi
 while read subj;
 do
-  f=${FBA_DIR}/${subj}/${fixel_metric}_templateSpace_corresp2template.msf
-  frelative="../${subj}/${fixel_metric}_templateSpace_corresp2template.msf"
+  #f=${FBA_DIR}/${subj}/${fixel_metric}_templateSpace_corresp2template.msf
+  #frelative="../${subj}/${fixel_metric}_templateSpace_corresp2template.msf"
+  f=${FBA_DIR}/template/${fixel_metric}/${subj}.mif
+  ff=$(basename $f)
   if [ ! -f $f ]
   then
     echo "  [ERROR] Cannot find file: $f"
     isOK=0
   else
-    echo $frelative >> $inputFiles
+    echo $ff >> $inputFiles
   fi
 done < <(cat $subjects)
 
@@ -84,26 +96,28 @@ cat   $contrasts
 echo "  [INFO] End of design"
 
 
-# mrtrix can only handle one contrast at a time. It is easier to write them all down in a single file, and this while will separate them.
+# mrtrix can only handle one contrast at a time. 
+# It is easier to write them all down in a single file, 
+# and this while will separate them.
 c=0
-RAMneeded=64
+RAMneeded=24000
 while read line;
 do
   thisContrast=${FBA_DIR}/logs/`basename ${analysis_prefix}`_contrast_${c}.txt
   echo "  [INFO] Contrast $c is $thisContrast"
   echo "         $line"
   echo $line > $thisContrast
-  fsl_sub -R $RAMneeded -N st${c}_${fixel_metric} -l ${FBA_DIR}/logs fixelcfestats \
-    -nperms $nperms \
+  #fsl_sub -R $RAMneeded -N st${c}_${fixel_metric} -l ${FBA_DIR}/logs \
+  my_do_cmd -fake fixelcfestats \
+    -nshuffles $nperms \
     -info \
-    -negative \
-    -smooth $fwhm \
+    ${FBA_DIR}/template/${fixel_metric}_smooth/ \
     $inputFiles \
-    $analysis_fixel_mask \
     $designmat \
     $thisContrast \
-    $template_sift_tracks \
-    ${output_prefix}_${fixel_metric}_contrast${c}_
+    $connmatrix \
+    ${FBA_DIR}/template/stats_${fixel_metric}
+
   c=$(( $c+1 ))
 done < <(cat $contrasts)
 
