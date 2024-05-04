@@ -13,7 +13,7 @@ voxelsize=1.0
 nTracksOrig=20000000
 nTracksSift=2000000
 fixel_metric="fd"
-nthreads=7
+nthreads=6
 ### end defaults
 
 
