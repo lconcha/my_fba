@@ -53,7 +53,7 @@ fi
 
 
 my_do_cmd dwi2response dhollander \
-   -scratch ${FBA_DIR}/logs/tmp \
+   -scratch /tmp \
    -mask $mask \
    -voxels ${FBA_DIR}/${subj}/sf_final_mask.mif \
    $dwis \
