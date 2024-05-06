@@ -3,7 +3,7 @@
 
 ### Defaults
 list_of_subjects=""
-fixel_mask_threshold=0.25
+fixel_mask_threshold=0.06
 fwhm=10
 nperms=5000
 prefix=""
@@ -13,6 +13,7 @@ voxelsize=1.0
 nTracksOrig=20000000
 nTracksSift=2000000
 fixel_metric="fd"
+nthreads=6
 ### end defaults
 
 
@@ -46,6 +47,7 @@ Options:
                                 Default is $nTracksOrig
 -nTracksSift <int>            : Number of tracks to keep after SIFT
                                 Default is $nTracksSift
+-nthreads <int>               : Number of threads per job.
 
 Note that -analysis_prefix and -results_prefix are mandatory if the Step stats is to be executed.
 
@@ -64,6 +66,7 @@ response              : 4. Compute the response function.
 av_response           : 5. Average all subjects response functions to a single one.
                            This response function will be used to estimate FODs on each subject.
 fod                   : 6. Compute the FOD
+mtnormalise           : 6a. Multi-tissue intensity normalisation of FODs.
 build_fod_template    : 7. Build the FOD template. Very time consuming.
 fod2template          : 8. Register the subject FOD to the template FOD.
 maskIntersection      : 9. Calculate the intersection of masks of all subjects.
@@ -76,7 +79,12 @@ fixel_metrics         : 14. Compute fibre cross-section (FC) and fibre density a
 tracto                : 15. Run tractography on the template FOD.
                             Will create $nTracksOrig tracks
                             then run SIFT to get it down to $nTracksSift.
-stats                 : 16. Compute statistics
+fixelconnectivity     : 16. Compute the fixel-fixel connectivity  matrix.
+                            It is highly recommended to increase -nthreads
+                            (check your cluster with qhost and find how high you can go)
+fixelfilter           : 17. Smooth the fixels. 
+                            Change the fwhm using -fwhm. Default is $fwhm.
+stats                 : 18. Compute statistics
                             Requires some additional information, supplied by these switches:
                             -analysis_prefix <string> (no default)
                             -results_prefix   <string> (no default)
@@ -183,6 +191,11 @@ do
    echo "  [INFO] User specified fixel metric to evaluate in stats, setting it to $fixel_metric"
    shift;shift
   ;;
+  -nthreads)
+   nthreads=$2
+   echo "  [INFO] User specified nthreads: $nthreads"
+   shift;shift
+  ;;
   esac
 done
 
@@ -204,18 +217,30 @@ done
     exit 0
   ;;
   maskIntersection)
-    fsl_sub -N maskIntx -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads  -N maskIntx -l ${FBA_DIR}/logs \
     my_fba_maskIntersection.sh
     exit 0
   ;;
   fixel_mask)
-    fsl_sub -N fixelmask -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads  -N fixelmask -l ${FBA_DIR}/logs \
     my_fba_createFixelMask.sh $fixel_mask_threshold
     exit 0
   ;;
   tracto)
-    fsl_sub -N tracto -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads  -N tracto -l ${FBA_DIR}/logs \
     my_fba_fullTemplateTracto.sh $nTracksOrig $nTracksSift
+    exit 0
+  ;;
+  fixelfilter)
+    echo "[INFO] This step needs a lot of RAM. fsl_sub will try to find a PC with at least 24G."
+    fsl_sub -s smp,$nthreads  -N fixelfilt -l ${FBA_DIR}/logs -R 24000 \
+    my_fba_fixelfilter.sh $fwhm
+    exit 0
+  ;;
+  fixelconnectivity)
+    echo "[INFO] This step needs a lot of RAM. fsl_sub will try to find a PC with at least 24G."
+    fsl_sub -s smp,$nthreads  -N fixelconn -l ${FBA_DIR}/logs -R 24000 \
+    my_fba_fixelconnectivity.sh
     exit 0
   ;;
   stats)
@@ -268,6 +293,12 @@ do
     continue
   fi
 
+  if [ ! -f ${FBA_DIR}/${subj}/dwis.mif ]
+  then
+    echo "  [INFO] $subj is not a valid subject."
+    continue
+  fi
+
   echo "  [INFO] Submitting job $stepToRun for subject $subj"
 
   case $stepToRun in
@@ -275,51 +306,55 @@ do
     echo "  This is just a test for subject $subj"
   ;;
   qtest)
-    fsl_sub -R 3 -N s${subj}_test -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads -N s${subj}_test -l ${FBA_DIR}/logs \
     my_fba_test.sh $subj
   ;;
   mask)
-    fsl_sub -R 3 -N s${subj}_mask -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads -N s${subj}_mask -l ${FBA_DIR}/logs \
         my_fba_mask.sh $subj
   ;;
   std_signal)
-    fsl_sub -R 3 -N s${subj}_std -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads -N s${subj}_std -l ${FBA_DIR}/logs \
         my_fba_stdSignal.sh $subj fa
   ;;
   response)
-    fsl_sub -R 3 -N s${subj}_resp -l ${FBA_DIR}/logs \
+    fsl_sub -s smp,$nthreads -N s${subj}_resp -l ${FBA_DIR}/logs \
         my_fba_response.sh $subj
   ;;
   upsample)
-    fsl_sub -R 3 -N s${subj}_up -l ${FBA_DIR}/logs -R 6 \
+    fsl_sub -s smp,$nthreads -N s${subj}_up -l ${FBA_DIR}/logs -R 6 \
         my_fba_upsample.sh $subj $voxelsize
   ;;
   fod)
-    fsl_sub -R 3 -N s${subj}_fod -l ${FBA_DIR}/logs -R 6 \
+    fsl_sub -s smp,$nthreads -N s${subj}_fod -l ${FBA_DIR}/logs -R 6 \
         my_fba_fod.sh $subj
   ;;
+  mtnormalise)
+    fsl_sub -s smp,$nthreads -N s${subj}_fod -l ${FBA_DIR}/logs -R 6 \
+        my_fba_mtnormalise.sh $subj
+  ;;
   fod2template)
-     fsl_sub -R 3 -N s${subj}_rfod -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_rfod -l ${FBA_DIR}/logs -R 6 \
         my_fba_fod2template.sh $subj
   ;;
   afd)
-     fsl_sub -R 3 -N s${subj}_afd -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_afd -l ${FBA_DIR}/logs -R 6 \
         my_fba_afd.sh $subj
   ;;
   fixel_reorient)
-     fsl_sub -R 3 -N s${subj}_fr -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_fr -l ${FBA_DIR}/logs -R 6 \
         my_fba_fixelReorient.sh $subj
   ;;
   fixel_correspondence)
-     fsl_sub -R 3 -N s${subj}_fc -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_fc -l ${FBA_DIR}/logs -R 6 \
         my_fba_fixelcorrespondence.sh $subj
   ;;
   fixel_metrics)
-     fsl_sub -R 3 -N s${subj}_fm -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_fm -l ${FBA_DIR}/logs -R 6 \
         my_fba_computeMetrics.sh $subj
   ;;
   simplemetrics)
-     fsl_sub -R 3 -N s${subj}_t -l ${FBA_DIR}/logs -R 6 \
+     fsl_sub -s smp,$nthreads -N s${subj}_t -l ${FBA_DIR}/logs -R 6 \
         my_fba_simplemetrics.sh $subj
   ;;
   *)

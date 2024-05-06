@@ -18,11 +18,20 @@ fi
 
 fod=${FBA_DIR}/${subj}/wm_fod.mif
 mask=${FBA_DIR}/${subj}/mask_upsampled.mif
-fod_template=${FBA_DIR}/template_fod.mif
+fod_template=${FBA_DIR}/template/fod.mif
 warp_subj2template=${FBA_DIR}/${subj}/fod_subj2template_warp.mif
 warp_template2subj=${FBA_DIR}/${subj}/fod_template2subj_warp.mif
 transformed_fod=${FBA_DIR}/${subj}/fod_templateSpace_noReorient.mif
 transformed_mask=${FBA_DIR}/${subj}/mask_templateSpace.mif
+
+
+fcheck=$transformed_fod
+if [ -f $fcheck ]
+then
+  echo "[INFO] File exists, not overwriting: $fcheck"
+  exit 0
+fi
+
 
 echo "  [INFO] Starting FOD registration for subject $subj"
 
@@ -59,7 +68,7 @@ my_do_cmd mrregister $fod \
 echo "  [INFO] Transforming fod to template without fixel reorientation"
 my_do_cmd mrtransform $fod \
   -warp $warp_subj2template \
-  -noreorientation \
+  -reorient_fod no \
   $transformed_fod
 
 

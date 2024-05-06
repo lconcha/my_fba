@@ -11,11 +11,11 @@ echo "Running on `hostname`"
 
 nTracksOrig=$1
 nTracksSift=$2
-template_fod=${FBA_DIR}/template_fod.mif
-template_mask=${FBA_DIR}/template_mask_intersection.mif
-analysis_fixel_mask=${FBA_DIR}/template_analysis_fixel_mask.msf
-template_full_tracks=${FBA_DIR}/template_fullTracto.tck
-template_sift_tracks=${FBA_DIR}/template_fullTracto_sifted.tck
+template_fod=${FBA_DIR}/template/fod.mif
+template_mask=${FBA_DIR}/template/template_mask.mif
+analysis_fixel_mask=${FBA_DIR}/template/analysis_fixel_mask.msf
+template_full_tracks=${FBA_DIR}/template/fullTracto.tck
+template_sift_tracks=${FBA_DIR}/template/fullTracto_sifted.tck
 
 angle=22.5
 maxlen=250
@@ -51,7 +51,7 @@ cmd="tckgen \
   $template_fod \
   -seed_image $template_mask \
   -mask $template_mask \
-  -number $nTracksOrig \
+  -select $nTracksOrig \
   $template_full_tracks"
 echo "  --> $cmd"
 time $cmd

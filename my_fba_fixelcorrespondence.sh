@@ -23,13 +23,23 @@ subj=$1
 
 
 
-fd_std_reorient=${FBA_DIR}/${subj}/fd_templateSpace_reorient.msf
-analysis_fixel_mask=${FBA_DIR}/template_analysis_fixel_mask.msf
-fd_std_corr2template=${FBA_DIR}/${subj}/fd_templateSpace_corresp2template.msf
+fd_fixels_std_reorient=${FBA_DIR}/${subj}/fixels_in_template_space_reoriented/fd.mif
+template_fd=${FBA_DIR}/template/fd
+template_fixel_mask=${FBA_DIR}/template/fixel_mask
+subj_fd_reoriented=${subj}.mif
+
+
+fcheck=${template_fd}/${subj_fd_reoriented}
+if [ -f $fcheck ]
+then
+  echo "[INFO] File exists, not overwriting: $fcheck"
+  exit 0
+fi
+
 
 
 isOK=1
-for f in $fd_std_reorient $analysis_fixel_mask
+for f in $fd_std_reorient
 do
   if [ ! -f $f ]
   then
@@ -37,6 +47,16 @@ do
     isOK=0
   fi
 done
+
+if [ ! -d $template_fixels ]
+then
+  echo "[ERROR] Cannot find directory: $template_fixels"
+  isOK=0
+fi
+
+
+
+
 if [ $isOK -eq 0 ]
 then
   echo "  [ERROR] Cannot perform fixel correspondence for subject $subj. Quitting."
@@ -44,6 +64,9 @@ then
 fi
 
 
-my_do_cmd fixelcorrespondence $fd_std_reorient \
-  $analysis_fixel_mask \
-  $fd_std_corr2template
+my_do_cmd fixelcorrespondence \
+  $fd_fixels_std_reorient \
+  $template_fixel_mask \
+  $template_fd \
+  $subj_fd_reoriented
+

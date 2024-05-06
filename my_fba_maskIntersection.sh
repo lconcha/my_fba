@@ -7,8 +7,8 @@ echo "  Running on `hostname`"
 # To ensure subsequent analysis is performed in voxels that contain data from all subjects, 
 # we warp all subject masks into template space and compute the mask intersection. 
 
-mask_intersection=${FBA_DIR}/template_mask_intersection.mif
-mask_prevalence=${FBA_DIR}/template_mask_prevalence.mif
+mask_intersection=${FBA_DIR}/template/template_mask.mif
+mask_prevalence=${FBA_DIR}/template/template_mask_prevalence.mif
 
 listOfMasks=""
 for f in ${FBA_DIR}/*/mask_templateSpace.mif

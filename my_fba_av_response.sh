@@ -58,6 +58,6 @@ av_response=${FBA_DIR}/average_${tissue}_response.txt
     exit 2
   fi
 
-  my_do_cmd average_response ${FBA_DIR}/*/${tissue}_response.txt $av_response
+  my_do_cmd responsemean ${FBA_DIR}/*/${tissue}_response.txt $av_response
 
 done

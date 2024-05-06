@@ -49,10 +49,10 @@ fi
 # fi
 
 
-mkdir -p ${FBA_DIR}/logs/template
+mkdir -p ${FBA_DIR}/template
 
-ln_fod_dir=${FBA_DIR}/logs/template/fods
-ln_mask_dir=${FBA_DIR}/logs/template/masks
+ln_fod_dir=${FBA_DIR}/template/fods
+ln_mask_dir=${FBA_DIR}/template/masks
 for d in $ln_fod_dir $ln_mask_dir
   do
   if [ ! -d $d ]
@@ -66,7 +66,7 @@ echo "  [INFO] Making sure the template directories are empty"
 rm ${ln_fod_dir}/*
 rm ${ln_mask_dir}/*
 
-subjects_file=${FBA_DIR}/logs/template/subjects_to_build_template_from.txt
+subjects_file=${FBA_DIR}/template/subjects_to_build_template_from.txt
 
 
 
@@ -76,7 +76,7 @@ then
   cp $nsubjs $subjects_file
 fi
 
-available_subjects_file=${FBA_DIR}/logs/template/available_subjects_to_build_template_from.txt
+available_subjects_file=${FBA_DIR}/template/available_subjects_to_build_template_from.txt
 ls ${FBA_DIR}/*/wm_fod.mif > $available_subjects_file
 n_available_subjects=`wc -l $available_subjects_file | awk '{print $1}'`
 
@@ -133,8 +133,8 @@ echo "  [INFO] It is best to run this step on an execution host.
 
 my_do_cmd -fake population_template \
   -mask_dir $ln_mask_dir \
-  -warp_dir ${FBA_DIR}/logs/template/warps \
-  -linear_transformations_dir ${FBA_DIR}/logs/template/xfms \
-  -template_mask ${FBA_DIR}/logs/template/template_mask.mif \
+  -warp_dir ${FBA_DIR}/template/warps \
+  -linear_transformations_dir ${FBA_DIR}/template/xfms \
+  -template_mask ${FBA_DIR}/template/mask.mif \
   $ln_fod_dir  \
-  ${FBA_DIR}/template_fod.mif
+  ${FBA_DIR}/template/fod.mif

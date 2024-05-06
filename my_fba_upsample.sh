@@ -73,9 +73,11 @@ then
   ln -sv `readlink -f $dwis_std` $dwis_upsampled
   ln -sv `readlink -f $mask` $mask_upsampled
 else
-  my_do_cmd mrresize $dwis_std -voxel $voxelsize $tmpFile1
+  #my_do_cmd mrresize $dwis_std -voxel $voxelsize $tmpFile1
+  my_do_cmd mrgrid -voxel $voxelsize $dwis_std regrid $tmpFile1
   cp -v $tmpFile1 $dwis_upsampled
-  my_do_cmd mrresize -voxel $voxelsize -interp nearest $mask $tmpFile2
+  #my_do_cmd mrresize -voxel $voxelsize -interp nearest $mask $tmpFile2
+  my_do_cmd mrgrid -interp nearest -voxel $voxelsize $mask regrid $tmpFile2
   cp -v $tmpFile2 $mask_upsampled
 fi
 

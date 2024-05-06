@@ -15,13 +15,13 @@ then
 fi
 
 
-template_fod=${FBA_DIR}/template_fod.mif
-template_mask=${FBA_DIR}/template_mask_intersection.mif
-analysis_fixel_mask=${FBA_DIR}/template_analysis_fixel_mask.msf
+template_fod=${FBA_DIR}/template/fod.mif
+template_mask=${FBA_DIR}/template/template_mask.mif
+template_fixel_mask=${FBA_DIR}/template/fixel_mask
 
-if [ -f $analysis_fixel_mask ]
+if [ -d $template_fixel_mask ]
 then
-  echo "  [INFO] Analysis fixel mask exists: $analysis_fixel_mask"
+  echo "  [INFO] Analysis fixel mask exists: $template_fixel_mask"
   echo "         Not overwriting. Exit now."
   exit 0
 fi
@@ -48,41 +48,31 @@ then
   echo "  [ERROR] Cannot create a fixel image from the template fod."
   exit 2
 fi
-template_peaks=${FBA_DIR}/template_peaks.msf
+
+
+template_fixels=${FBA_DIR}/template/fixels
 my_do_cmd fod2fixel\
-  $template_fod \
   -mask $template_mask \
-  -peak $template_peaks
-
-
-
-
-# Next view the peaks file using the vector plot tool in mrview and identify an appropriate threshold that removes peaks from grey matter, yet does not introduce any ‘holes’ in your white matter (approximately 0.33) (lconcha likes 0.25).
-analysis_fixel_mask_tmp=${tmpDir}/template_analysis_fixel_mask.msf
-my_do_cmd fixelthreshold -crop $template_peaks $peak_threshold $analysis_fixel_mask_tmp
-
-
-
-# Generate an analysis voxel mask from the fixel mask. The median filter in this step should remove spurious voxels outside the brain, and fill in the holes in deep white matter where you have small peaks due to 3-fibre crossings:
-analysis_voxel_mask=${FBA_DIR}/template_analysis_voxel_mask.mif
-fixel2voxel $analysis_fixel_mask_tmp count - | mrthreshold - - -abs 0.5 | mrfilter - median $analysis_voxel_mask
-
-# Recompute the fixel mask using the analysis voxel mask. Using the mask allows us to use a lower AFD threshold than possible in the steps above, to ensure we have included fixels with low AFD inside white matter:
-my_do_cmd fod2fixel \
-  -mask $analysis_voxel_mask \
   $template_fod \
-  -peak ${tmpDir}/template_temp_step.msf
+  $template_fixels
 
-# we finalize the fixel mask
-my_do_cmd fixelthreshold \
-  ${tmpDir}/template_temp_step.msf \
-  -crop 0.2 \
-  $analysis_fixel_mask
-  
- 
-# We recommend having no more than 500,000 fixels in the analysis_fixel_mask (you can check this with fixelstats), otherwise downstream statistical analysis (using fixelcfestats) will run out of RAM). A mask with 500,000 fixels will require a PC with 128GB of RAM for the statistical analysis step.
-nfixels=`fixelstats $analysis_fixel_mask -output count`
-echo "  [INFO] Number of fixels in fixel mask: $nfixels"
+
+
+# Generate an analysis voxel mask from the fixel mask. 
+# The median filter in this step should remove spurious voxels outside the brain,
+#  and fill in the holes in deep white matter where you have small peaks due to 3-fibre crossings:
+echo "[INFO] Cleaning the fixel mask a bit..."
+analysis_voxel_mask=${FBA_DIR}/template/analysis_voxel_mask.mif
+my_do_cmd fixel2voxel ${template_fixels}/directions.mif count ${tmpDir}/fixelcounts.mif 
+my_do_cmd mrthreshold ${tmpDir}/fixelcounts.mif ${tmpDir}/fixelcounts_abs.mif -abs 0.5
+my_do_cmd mrfilter ${tmpDir}/fixelcounts_abs.mif median $analysis_voxel_mask
+
+# Generate a fixel mask
+my_do_cmd fod2fixel \
+  -mask $analysis_voxel_mask  \
+  -fmls_peak_value $peak_threshold \
+  $template_fod \
+  $template_fixel_mask
 
 
 rm -fRv $tmpDir

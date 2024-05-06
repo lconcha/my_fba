@@ -21,13 +21,20 @@ subj=$1
 # Here we reorient the direction of all fixels based on the Jacobian matrix (local affine transformation) at each voxel in the warp:
 
 
-fd_std_noReorient=${FBA_DIR}/${subj}/fd_templateSpace_noReorient.msf
+fixels_std_noReorient=${FBA_DIR}/${subj}/fixels_in_template_space_NOT_REORIENTED
 warp_subj2template=${FBA_DIR}/${subj}/fod_subj2template_warp.mif
-fd_std_reorient=${FBA_DIR}/${subj}/fd_templateSpace_reorient.msf
+fixels_std_reorient=${FBA_DIR}/${subj}/fixels_in_template_space_reoriented
 
 
 isOK=1
-for f in $fd_std_noReorient $warp_subj2template
+
+if [ ! -d $fixels_std_noReorient ]
+then
+    echo "  [ERROR] Cannot find fixel directory: $fixels_std_noReorient"
+    isOK=0
+fi
+
+for f in $warp_subj2template
 do
   if [ ! -f $f ]
   then
@@ -44,6 +51,6 @@ fi
 
 echo "  [INFO] Performing fixel reorientaion"
 my_do_cmd fixelreorient \
-  $fd_std_noReorient \
+  $fixels_std_noReorient \
   $warp_subj2template \
-  $fd_std_reorient
+  $fixels_std_reorient
