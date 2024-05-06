@@ -113,7 +113,6 @@ FBA_DIR
 
 LU15 (0N(H4
 INB, UNAM
-November 2016
 lconcha@unam.mx
 
 "
