@@ -66,14 +66,23 @@ then
 fi
 
 
+tmpDir=$(mktemp -d)
 
-
+tmp_wm_fod=${tmpDir}/wm_fod.mif
+tmp_gm_fod=${tmpDir}/gm_fod.mif
+tmp_csf_fod=${tmpDir}/csf_fod.mif
 
 my_do_cmd dwi2fod msmt_csd \
   -mask $mask_upsampled \
   $dwis_std_upsampled \
-  $av_wm_response $wm_fod \
-  $av_gm_response $gm_fod \
-  $av_csf_response $csf_fod
-  
+  $av_wm_response $tmp_wm_fod \
+  $av_gm_response $tmp_gm_fod \
+  $av_csf_response $tmp_csf_fod
+
+
+my_do_cmd cp $tmp_wm_fod  $wm_fod
+my_do_cmd cp $tmp_gm_fod  $gm_fod
+my_do_cmd cp $tmp_csf_fod $csf_fod
+
+my_do_cmd rm -fR $tmpDir
 
