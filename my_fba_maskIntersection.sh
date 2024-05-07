@@ -15,6 +15,11 @@ for f in ${FBA_DIR}/*/mask_templateSpace.mif
 do
   tmpvar=`dirname $f`
   subj=`basename $tmpvar`
+  if [ -f ${FBA_DIR}/${subj}/exclude ]
+  then
+    echo "  [INFO] Excluding subject $subj"
+    continue
+  fi
   if [ ! -f $f ]
   then
     echo "  [WARNING] Did not find mask: $f"
