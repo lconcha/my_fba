@@ -32,6 +32,12 @@ av_response=${FBA_DIR}/average_${tissue}_response.txt
     then
       continue
     fi
+
+    if [[ "$subj" = "template" ]]
+    then
+      echo "  [INFO] Not including the template in this step, of course."
+      continue
+    fi
     
 
 
