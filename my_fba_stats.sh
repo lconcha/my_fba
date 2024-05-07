@@ -3,10 +3,10 @@ source `which my_do_cmd`
 echo "  Running on `hostname`"
 
 
-if [ "$#" -lt 5 ]
+if [ "$#" -lt 4 ]
 then
   echo "  [ERROR]. Insufficient arguments."
-  echo "  Usage: `basename $0` analysis_prefix output_prefix fwhm nperms fixel_metric"
+  echo "  Usage: `basename $0` analysis_prefix output_prefix nperms fixel_metric"
   echo ""
   echo "  This script is part of the set of scripts required for fixel-based analyses."
   echo "  See my_fba.sh for help."
@@ -27,9 +27,8 @@ fi
 
 analysis_prefix=$1
 output_prefix=$2
-fwhm=$3
-nperms=$4
-fixel_metric=$5
+nperms=$3
+fixel_metric=$4
 
 subjects=${analysis_prefix}.subjects
 designmat=${analysis_prefix}.design_matrix
@@ -65,14 +64,20 @@ then
 fi
 
 
+fixel_dir_smooth=${FBA_DIR}/template/${fixel_metric}_smooth
+if [ ! -d $fixel_dir_smooth ]
+then
+  echo "  [ERROR] Directory does not exist: $fixel_dir_smooth"
+  echo "          Maybe it is not a valid metric? Remember to input the _smooth version!"
+  exit 2
+fi
+
 
 # populate the inputFiles
 inputFiles=${FBA_DIR}/logs/inputFiles_`basename $analysis_prefix`_${fixel_metric}_$$.txt
 if [ -f $inputFiles ]; then rm $inputFiles;fi
 while read subj;
 do
-  #f=${FBA_DIR}/${subj}/${fixel_metric}_templateSpace_corresp2template.msf
-  #frelative="../${subj}/${fixel_metric}_templateSpace_corresp2template.msf"
   f=${FBA_DIR}/template/${fixel_metric}/${subj}.mif
   ff=$(basename $f)
   if [ ! -f $f ]
@@ -102,7 +107,7 @@ echo;echo "  [USER] Now copy/paste this command and run it:"
 my_do_cmd -fake fixelcfestats \
     -nshuffles $nperms \
     -info \
-    ${FBA_DIR}/template/${fixel_metric}_smooth/ \
+    $fixel_dir_smooth \
     $inputFiles \
     $designmat \
     $contrasts \

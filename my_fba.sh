@@ -254,7 +254,7 @@ done
       echo "  [ERROR]  Please specify a valid -results_prefix"
       exit 2
     fi
-      my_fba_stats.sh $analysis_prefix $results_prefix $fwhm $nperms $fixel_metric
+      my_fba_stats.sh $analysis_prefix $results_prefix $nperms $fixel_metric
     exit 0
  esac
 
