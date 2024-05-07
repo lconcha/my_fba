@@ -96,30 +96,20 @@ cat   $contrasts
 echo "  [INFO] End of design"
 
 
-# mrtrix can only handle one contrast at a time. 
-# It is easier to write them all down in a single file, 
-# and this while will separate them.
-c=0
-RAMneeded=24000
-while read line;
-do
-  thisContrast=${FBA_DIR}/logs/`basename ${analysis_prefix}`_contrast_${c}.txt
-  echo "  [INFO] Contrast $c is $thisContrast"
-  echo "         $line"
-  echo $line > $thisContrast
-  #fsl_sub -R $RAMneeded -N st${c}_${fixel_metric} -l ${FBA_DIR}/logs \
-  my_do_cmd -fake fixelcfestats \
+out_stats_dir=${FBA_DIR}/template/stats_${fixel_metric}/`basename $analysis_prefix`
+mkdir -pv $out_stats_dir
+echo;echo "  [USER] Now copy/paste this command and run it:"
+my_do_cmd -fake fixelcfestats \
     -nshuffles $nperms \
     -info \
     ${FBA_DIR}/template/${fixel_metric}_smooth/ \
     $inputFiles \
     $designmat \
-    $thisContrast \
+    $contrasts \
     $connmatrix \
-    ${FBA_DIR}/template/stats_${fixel_metric}
+    $out_stats_dir
 
-  c=$(( $c+1 ))
-done < <(cat $contrasts)
+
 
 
 

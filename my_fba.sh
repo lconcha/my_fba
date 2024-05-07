@@ -34,7 +34,7 @@ Options:
                        Three files that start with this string are needed:
                        prefix.subjects       The IDs of the subjects to analyze.
                        prefix.design_matrix  The design matrix (according to the previous file)
-                       prefix.contrasts      The contrast to do (only one, for now)
+                       prefix.contrasts      The contrast to do, one per row.
 -results_prefix <string>      : The prefix of resulting files from the statistical analysis.
 -fwhm <int>
 -nperms <int>
