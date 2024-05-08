@@ -31,10 +31,29 @@ Options:
 -subjects <subjects_to_process.txt> Default is to process all subjects in \$FBA_DIR
 -subject_list <\"id1 id2 id3 ...\"> Same as above, but inline.
 -analysis_prefix <string>     : Analysis prefix.
-                       Three files that start with this string are needed:
-                       prefix.subjects       The IDs of the subjects to analyze.
-                       prefix.design_matrix  The design matrix (according to the previous file)
-                       prefix.contrasts      The contrast to do, one per row.
+                       Two files that start with this string are needed:
+                       prefix.design  The design matrix.
+                                      This is a space (or tab) separated file,
+                                      with one row per subject, GLM-style.
+                                      The first row should be commented and have the headers.
+                                      Patient IDs must be on the first column.
+                                      Example:
+                                      #participant patient control left right
+                                      sub-4375	0	1	0	0
+                                      sub-6354	1	0	0	1
+                                      sub-72145	0	1	0	0
+                                      sub-72521	0	1	0	0
+                                      sub-72524	1	0	0	1
+                                      sub-72525	1	0	0	0
+                                      sub-72756	1	0	0	1
+
+                       prefix.contrasts  The contrast to do, one per row.
+                                         Example:
+                                         1 -1 0 0
+                                         -1 1 0 0
+                                         0 0 -1 1
+                                         0 0 1 -1
+
 -results_prefix <string>      : The prefix of resulting files from the statistical analysis.
 -fwhm <int>
 -nperms <int>

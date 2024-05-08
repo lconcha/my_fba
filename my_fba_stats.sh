@@ -30,9 +30,14 @@ output_prefix=$2
 nperms=$3
 fixel_metric=$4
 
-subjects=${analysis_prefix}.subjects
-designmat=${analysis_prefix}.design_matrix
+
+design=${analysis_prefix}.design
 contrasts=${analysis_prefix}.contrasts
+
+
+
+
+
 analysis_fixel_mask=${FBA_DIR}/template/fixel_mask
 template_sift_tracks=${FBA_DIR}/template/fullTracto_sifted.tck
 connmatrix=${FBA_DIR}/template/matrix
@@ -42,7 +47,7 @@ connmatrix=${FBA_DIR}/template/matrix
 
 
 isOK=1
-for f in $designmat $contrasts $template_sift_tracks
+for f in $design $contrasts $template_sift_tracks
 do
   if [ ! -f $f ]
   then
@@ -72,6 +77,11 @@ then
   exit 2
 fi
 
+# Prepare files
+subjects=${analysis_prefix}.subjects
+designmat=${analysis_prefix}.design_matrix
+sed -e '/^\s*#.*$/d' $design | awk '{print $1}' > ${analysis_prefix}.subjects
+sed -e '/^\s*#.*$/d' $design | cut -f 1  --complement > $designmat
 
 # populate the inputFiles
 inputFiles=${FBA_DIR}/logs/inputFiles_`basename $analysis_prefix`_${fixel_metric}_$$.txt
