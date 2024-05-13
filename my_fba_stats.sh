@@ -90,6 +90,13 @@ while read subj;
 do
   f=${FBA_DIR}/template/${fixel_metric}/${subj}.mif
   ff=$(basename $f)
+  if [ -f ${FBA_DIR}/${subj}/exclude ]
+  then
+    echo "  [ERROR] Exclude file existis: ${FBA_DIR}/${subj}/exclude"
+    echo "          Either remove this subject from the design file,
+                    or delete the exclude file"
+    exit 2
+  fi
   if [ ! -f $f ]
   then
     echo "  [ERROR] Cannot find file: $f"
@@ -106,8 +113,9 @@ then
 fi
 
 echo "  [INFO] Stat analysis to be performed:"
-paste $designmat $inputFiles
-cat   $contrasts
+paste $designmat $inputFiles | awk -v OFS="\t"  '{$1=$1} 1'
+echo "---------------------------------------" 
+cat   $contrasts             | awk -v OFS="\t"  '{$1=$1} 1'
 echo "  [INFO] End of design"
 
 
